@@ -87,3 +87,79 @@ pip install로 가상환경에 설치한 패키지 정보를 requirements.txt에
 ```sh
 $ pip freeze > requirements.txt
 ```
+
+## 5. 모델 Migration
+장고는 migration과 model을 별도로 관리하는 Rails와는 다르게 Model을 기반으로 migration을 생성한다.  
+모델 코드를 작성하거나 수정하게되면 변경된 사항을 Django에서 인지하고 변경되 사항을 기반으로 migration 파일을 생성할 수 있다.  
+migration 파일을 생성하고 나면 migrate를 실행하는 절차를 거쳐서 DB에 반영한다.  
+
+### 5.1. Model 코드 작성
+`polls/models.py` 에 모델 코드를 작성한다.  
+튜토리얼의 안내대로 Question, Choice 모델을 작성했다.
+
+```python
+from django.db import models
+
+
+# Create your models here.
+class Question(models.Model):
+    question_text = models.CharField(max_length=200)
+    pub_date = models.DateTimeField("date published")
+
+
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice_text = models.CharField(max_length=200)
+    votes = models.IntegerField(default=0)
+
+```
+
+### 5.2. INSTALLED_APP에 등록
+Model 코드를 작성하고 나면 models.py가 속한 app을 settings.py의 INSTALLED_APP에 추가해야한다.  
+등록하지 않으면 Django에서 변경사항을 감지하지 않기 때문에
+이어서 진행할 `python manage.py makemigrations polls` 명령어를 실행했을 때 ` No migrations to apply.` 라는 메시지를 출력한다.  
+```python
+INSTALLED_APPS = [
+    "polls.apps.PollsConfig",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+]
+```
+### 5.3. Migration 파일 생성
+아래 명령어를 실행해 migration 파일을 생성한다.  
+그럼 다음과같이 Model을 생성했다는 결과를 확인할 수 있고 polls/migrations에 migration 파일이 생성된다.  
+여기까지 진행했을 때 아직 DB에는 반영된 상태가 아니다.  
+이어서 진행할 migrate 명령을 실행해야 DB에 적용된다.
+```sh
+$ python manage.py makemigrations polls
+Migrations for 'polls':
+  polls/migrations/0001_initial.py
+    - Create model Question
+    - Create model Choice
+```
+
+### 5.4. Migrate 실행
+Migrate를 실행하기 전에 실제로 어떤 SQL이 실행되는지가 궁금하면 `sqlmigrate` 명령어를 실행해 확인해볼 수 있다.  0001은 생성된 migration 파일의 번호다.
+```sh
+$ python manage.py sqlmigrate polls 0001
+```
+
+migration을 실행하기 전에 다른 문제가 없는지 확인하려면 `check` 명령어를 실행해서 확인할 수 있다.
+```sh
+$ python manage.py check
+System check identified no issues (0 silenced).
+```
+
+`migrate` 명령을 실행하면 실제로 DB에 테이블이 생성된다.  
+생성한 테이블 이름은 prefix로 app 이름이 붙어서 각각 polls_question, polls_choice 로 생성된다.
+```sh
+$ python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, polls, sessions
+Running migrations:
+  Applying polls.0001_initial... OK
+```
