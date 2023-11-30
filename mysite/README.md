@@ -163,3 +163,10 @@ Operations to perform:
 Running migrations:
   Applying polls.0001_initial... OK
 ```
+
+## 6. Django admin 설정
+
+### 6.1. 관리자 생성
+```sh
+$ python manage.py createsuperuser
+```
