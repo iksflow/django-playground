@@ -170,3 +170,26 @@ Running migrations:
 ```sh
 $ python manage.py createsuperuser
 ```
+
+## 7. Django test코드 실행
+```sh
+$ python manage.py test polls
+Found 1 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+F
+======================================================================
+FAIL: test_was_published_recently_with_future_question (polls.tests.QuestionModelTests.test_was_published_recently_with_future_question)
+was_published_recently() returns False for questions whose pub_date is in the future.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/sisung/iksflow/django-playground/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_question
+    self.assertIs(future_question.was_published_recently(), False)
+AssertionError: True is not False
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (failures=1)
+Destroying test database for alias 'default'...
+```
