@@ -193,3 +193,25 @@ Ran 1 test in 0.002s
 FAILED (failures=1)
 Destroying test database for alias 'default'...
 ```
+
+## 8. Django debug toolbar 설치
+아래 페이지의 Installation을 참고해 설치.
+https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
+
+### 8.1. 의존성 설치
+```sh
+$ python -m pip install django-debug-toolbar
+```
+
+### 8.2. start
+```python
+INSTALLED_APPS = [
+    # ...
+    "django.contrib.staticfiles",
+    # ...
+]
+
+STATIC_URL = "static/"
+```
+
+
